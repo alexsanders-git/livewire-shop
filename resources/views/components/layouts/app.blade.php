@@ -177,8 +177,6 @@
                         <h4>Information</h4>
                         <ul class="list-unstyled">
                             <li><a href="{{ route('home') }}" wire:navigate>Home</a></li>
-                            <li><a href="{{ route('category') }}" wire:navigate>Payment</a></li>
-                            <li><a href="{{ route('product') }}" wire:navigate>Delivery</a></li>
                             <li><a href="#">Contacts</a></li>
                         </ul>
                     </div>
