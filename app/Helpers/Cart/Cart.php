@@ -6,17 +6,17 @@ use App\Models\Product;
 
 class Cart
 {
-    public static function addToCart( int $id, int $quantity = 1 ): bool
+    public static function addToCart(int $id, int $quantity = 1): bool
     {
         $added = false;
 
-        if ( self::hasProductInCart( $id ) ) {
-            session( [ "cart.{$id}.quantity" => session( "cart.{$id}.quantity" ) + $quantity ] );
+        if (self::hasProductInCart($id)) {
+            session(["cart.{$id}.quantity" => session("cart.{$id}.quantity") + $quantity]);
             $added = true;
         } else {
-            $product = Product::find( $id );
+            $product = Product::find($id);
 
-            if ( $product ) {
+            if ($product) {
                 $new_product = [
                     'title' => $product->title,
                     'slug' => $product->slug,
@@ -25,7 +25,7 @@ class Cart
                     'quantity' => $quantity,
                 ];
 
-                session( [ "cart.{$id}" => $new_product ] );
+                session(["cart.{$id}" => $new_product]);
                 $added = true;
             }
         }
@@ -33,13 +33,50 @@ class Cart
         return $added;
     }
 
-    public static function getCart( int $id = null ): array
+    public static function removeFromCart(int $id): bool
     {
-        return session( 'cart' ) ?: [];
+        $removed = false;
+
+        if (self::hasProductInCart($id)) {
+            session()->forget("cart.{$id}");
+            $removed = true;
+        }
+
+        return $removed;
     }
 
-    public static function hasProductInCart( int $id ): bool
+    public static function getCart(int $id = null): array
     {
-        return session()->has( "cart.{$id}" );
+        return session('cart') ?: [];
+    }
+
+    public static function getCartTotal(): int
+    {
+        $total = 0;
+
+        $cart = self::getCart();
+
+        foreach ($cart as $item) {
+            $total += $item['price'] * $item['quantity'];
+        }
+
+        return $total;
+    }
+
+    public static function getCartQuantityItems(): int
+    {
+        return count(self::getCart());
+    }
+
+    public static function getCartQuantityTotal(): int
+    {
+        $cart = self::getCart();
+
+        return array_sum(array_column($cart, 'quantity'));
+    }
+
+    public static function hasProductInCart(int $id): bool
+    {
+        return session()->has("cart.{$id}");
     }
 }
