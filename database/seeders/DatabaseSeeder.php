@@ -17,18 +17,19 @@ class DatabaseSeeder extends Seeder
     {
         // User::factory(10)->create();
 
-        User::factory()->create( [
+        User::factory()->create([
             'name' => 'Admin',
             'email' => 'admin@mail.com',
             'is_admin' => true,
             'email_verified_at' => now(),
             'password' => '123456',
-            'remember_token' => Str::random( 10 ),
-        ] );
+            'remember_token' => Str::random(10),
+        ]);
 
-        $this->call( [
+        $this->call([
             CategorySeeder::class,
             ProductSeeder::class,
-        ] );
+            FilterSeeder::class,
+        ]);
     }
 }
