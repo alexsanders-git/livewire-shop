@@ -41,6 +41,15 @@ class CategoryComponent extends Component
         $this->slug = $slug;
     }
 
+    public function updated($property)
+    {
+        $property = explode('.', $property);
+
+        if ($property[0] == 'selectedFilters') {
+            $this->resetPage();
+        }
+    }
+
     public function changeSort()
     {
         $this->sort = isset($this->sortList[$this->sort]) ? $this->sort : 'default';
