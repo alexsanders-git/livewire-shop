@@ -5,6 +5,7 @@ namespace App\Livewire\Product;
 use App\Helpers\Traits\CartTrait;
 use App\Models\Category;
 use App\Models\Product;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
 use Livewire\Attributes\Url;
 use Livewire\Component;
@@ -69,8 +70,23 @@ class CategoryComponent extends Component
             $filter_groups[$filter->filter_group_id][] = $filter;
         }
 
+        if ($this->selectedFilters) {
+            $cnt_filter_groups = DB::table('filters')
+                ->select(DB::raw('count(distinct filter_group_id) as cnt'))
+                ->whereIn('id', $this->selectedFilters)
+                ->value('cnt');
+        } else {
+            $cnt_filter_groups = 1;
+        }
+
         $products = Product::query()
             ->whereIn('category_id', explode(',', $ids))
+            ->when($this->selectedFilters, function (Builder $query) use ($cnt_filter_groups) {
+                $query->leftJoin(DB::raw('filter_products FORCE INDEX FOR JOIN (filter_id)'), 'filter_products.product_id', '=', 'products.id')
+                    ->whereIn('filter_products.filter_id', $this->selectedFilters)
+                    ->groupBy('id')
+                    ->havingRaw("count(distinct filter_products.filter_group_id) >= $cnt_filter_groups");
+            })
             ->orderBy($this->sortList[$this->sort]['order_field'], $this->sortList[$this->sort]['order_direction'])
             ->paginate($this->limit);
 
