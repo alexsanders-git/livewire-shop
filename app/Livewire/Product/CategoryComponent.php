@@ -45,6 +45,14 @@ class CategoryComponent extends Component
     public function mount(string $slug)
     {
         $this->slug = $slug;
+
+        if (! isset($this->sortList[$this->sort])) {
+            $this->redirectRoute('category', ['slug' => $slug], true);
+        }
+
+        if (! in_array($this->limit, $this->limitList)) {
+            $this->redirectRoute('category', ['slug' => $slug], true);
+        }
     }
 
     public function updated($property)
